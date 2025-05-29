@@ -1,8 +1,4 @@
-# HEADER AND DECLARATIONS FOR PROTOCOL 2
-BAUDRATE                    = 2000000
-PROTOCOL_VERSION            = 2.0
-DEVICENAME                  = 'COM7'
-#DEVICENAME                  = "/dev/ttyUSB0" #'COM7'
+from ROBOT_P2_CONFIG import *
 
 # CONTROL TABLE
 ADDR_TORQUE_ENABLE          = 64
@@ -21,9 +17,14 @@ from dynamixel_sdk import *
 # HANDLERS DEFINITION
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
+
+# SYNCS
 groupSyncWritePosition = GroupSyncWrite(portHandler, packetHandler, ADDR_GOAL_POSITION, LEN_GOAL_POSITION)
 groupSyncWriteSpeed = GroupSyncWrite(portHandler, packetHandler, ADDR_MOVING_SPEED, LEN_MOVING_SPEED)
 groupSyncReadPosition = GroupSyncRead(portHandler, packetHandler,ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+
+# BULKS
+groupBulkReadPosition = GroupBulkRead(portHandler, packetHandler)
 
 #groupBulkRead = GroupBulkRead(portHandler, packetHandler)
 
