@@ -38,12 +38,13 @@ class ROBOT_P2(DXL_P2):
         self.setMotorsPosition() # SYNC set new goal pos
         tf = time.time() # tf calcs
 
-        #print("elapsed before playtime sleep: " + str(tf-t0))
+        print("elapsed before playtime sleep: " + str(tf-t0))
         sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
         
-        #tf = time.time()
-        #print("elapsed after playtime : " + str(tf-t0))
-
+        tf = time.time()
+        print("elapsed after playtime : " + str(tf-t0))
+        print("")
+        
     def moveRobotByQVals_Sync(self,qf):
         self.qf = qf
         self.playtime = qf[-2]
