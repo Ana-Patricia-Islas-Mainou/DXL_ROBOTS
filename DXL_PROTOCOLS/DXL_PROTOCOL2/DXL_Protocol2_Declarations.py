@@ -21,10 +21,8 @@ packetHandler = PacketHandler(PROTOCOL_VERSION)
 # SYNCS
 groupSyncWritePosition = GroupSyncWrite(portHandler, packetHandler, ADDR_GOAL_POSITION, LEN_GOAL_POSITION)
 groupSyncWriteSpeed = GroupSyncWrite(portHandler, packetHandler, ADDR_MOVING_SPEED, LEN_MOVING_SPEED)
-groupSyncReadPosition = GroupSyncRead(portHandler, packetHandler,ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
 
-# BULKS
-groupBulkReadPosition = GroupBulkRead(portHandler, packetHandler)
+groupSyncReadPosition = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
 
 #groupBulkRead = GroupBulkRead(portHandler, packetHandler)
 

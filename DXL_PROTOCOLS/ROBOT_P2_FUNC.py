@@ -14,16 +14,18 @@ class ROBOT_P2(DXL_P2):
          
         self.motors = motorConfig
         self.nMotors = numberOfMotors
-        self.offsets = home_vals
+        self.offsets = home_vals[0:self.nMotors]
 
         # DEFINE ARRAYS FOR ARTICULAR MOVEMENT
-        self.q0 = home_vals # present position
-        self.qf = home_vals # desiered position
+        self.q0 = home_vals[0:self.nMotors] # present position
+        self.qf = home_vals[0:self.nMotors] # desiered position
         self.qVel = [1]*self.nMotors
 
         # DEFINE TIMMINGS
         self.playtime = 0
         self.pause = 0
+
+        self.configGetMotorsPosition_Sync()
 
     def moveRobotByQVals(self,qf):
         self.qf = qf
@@ -32,8 +34,8 @@ class ROBOT_P2(DXL_P2):
         t0 = time.time() # t0 calcs
         self.getMotorsPosition() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
-        self.setMotorsSpeed() # set new moving speed
-        self.setMotorsPosition() # set new goal pos
+        self.setMotorsSpeed() # SYNC set new moving speed
+        self.setMotorsPosition() # SYNC set new goal pos
         tf = time.time() # tf calcs
 
         #print("elapsed before playtime sleep: " + str(tf-t0))
@@ -42,6 +44,24 @@ class ROBOT_P2(DXL_P2):
         #tf = time.time()
         #print("elapsed after playtime : " + str(tf-t0))
 
+    def moveRobotByQVals_Sync(self,qf):
+        self.qf = qf
+        self.playtime = qf[-2]
+
+        t0 = time.time() # t0 calcs
+        self.getMotorsPosition_Sync() # get current pos
+        self.calculateMotorsSpeed() # calc moving pos
+        self.setMotorsSpeed() # SYNC set new moving speed
+        self.setMotorsPosition() # SYNC set new goal pos
+        tf = time.time() # tf calcs
+
+        print("elapsed before playtime sleep: " + str(tf-t0))
+        sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
+
+        tf = time.time()
+        print("elapsed after playtime : " + str(tf-t0))
+        print("")
+
     def getMotorsPosition(self):
         qPos = []
         for i in range(0, self.nMotors):
@@ -49,17 +69,24 @@ class ROBOT_P2(DXL_P2):
         self.q0 = qPos
         return self.q0
     
+    def configGetMotorsPosition_Sync(self):
+        for i in range(0, self.nMotors):
+            dxl_addparam_result = groupSyncReadPosition.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead addparam failed" % self.motors[i].ID)
+
     def getMotorsPosition_Sync(self):
         dxl_comm_result = groupSyncReadPosition.txRxPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-
+        #else:print("READ OK")
+        
         for i in range(0, self.nMotors):
             dxl_getdata_result = groupSyncReadPosition.isAvailable(self.motors[i].ID, 
                                  ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
             if dxl_getdata_result != True:
                 print("[ID:%03d] groupSyncRead getdata failed" % self.motors[i].ID)
-                self.q0[i] = 0
+                #self.q0[i] = 0
             else: 
                 self.q0[i] = groupSyncReadPosition.getData(self.motors[i].ID, 
                              ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
