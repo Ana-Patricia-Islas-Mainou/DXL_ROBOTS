@@ -1,4 +1,4 @@
-ROBOT_NAME                  = "ROBOT 1"
+ROBOT_NAME                  = "BOGO_H_LEEG_P2"
 
 # HEADER AND DECLARATIONS FOR DXL COM
 DEVICENAME                  = 'COM8'

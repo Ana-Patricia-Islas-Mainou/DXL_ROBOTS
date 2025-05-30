@@ -1,11 +1,11 @@
-ROBOT_NAME  = "ROBOT_1"
-
-from ROBOT_P2_FUNC import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.ROBOT_P2_FUNC import *
 from time import sleep
 robot = ROBOT_P2()
 
+# Iniciar la comunicacion
 startCom()
 
+# Encender torque de los motores
 robot.setMotorsTorque(1)
 
 """
@@ -22,7 +22,7 @@ des_pos2 = [1081, 1805, 2123]
 des_pos2.append(0.4) # play time
 des_pos2.append(0) # pause
 
-#print(des_pos)
+print(des_pos)
 #print(des_pos2)
 
 
@@ -30,9 +30,12 @@ robot.moveRobotByQVals(home_vals)
 #robot.moveRobotByQVals(des_pos2)
 
 # NOTA SYNC READ NO SIRVE SI 1 MOTOR ESTA MAL
+# NOTA PRIMERO MOVER SIN SYNC Y DESPUES CON SYNC 
 robot.moveRobotByQVals_Sync(des_pos2)
 robot.moveRobotByQVals_Sync(des_pos)
 robot.moveRobotByQVals_Sync(des_pos2)
+
+des_pos[-1] = 0.2
 robot.moveRobotByQVals_Sync(des_pos)
 
 robot.setMotorsTorque(0)

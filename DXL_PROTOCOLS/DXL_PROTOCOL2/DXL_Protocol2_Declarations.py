@@ -1,4 +1,4 @@
-from ROBOT_P2_CONFIG import *
+from ROBOTS.ROBOT_P2_CONFIG import *
 
 # CONTROL TABLE
 ADDR_TORQUE_ENABLE          = 64

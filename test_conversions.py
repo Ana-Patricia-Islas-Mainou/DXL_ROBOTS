@@ -1,6 +1,6 @@
-from DXL_PROTOCOL1.DXL_AX.DXL_AX_Functions import *
-from DXL_PROTOCOL1.DXL_MX.DXL_MX_Functions import *
-from DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Functions import *
+from DXL_PROTOCOLS.DXL_PROTOCOL1.DXL_AX.DXL_AX_Functions import *
+from DXL_PROTOCOLS.DXL_PROTOCOL1.DXL_MX.DXL_MX_Functions import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Functions import *
 
 print("")
 

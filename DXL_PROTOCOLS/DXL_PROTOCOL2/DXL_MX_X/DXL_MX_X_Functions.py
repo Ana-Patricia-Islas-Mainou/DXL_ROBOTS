@@ -1,5 +1,5 @@
-from DXL_PROTOCOL2.DXL_Protocol2_Declarations import *
-from DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Conversions import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_Protocol2_Declarations import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Conversions import *
 
 class DXL_P2(DXL_P2_CONV):
     def __init__(self, ID):

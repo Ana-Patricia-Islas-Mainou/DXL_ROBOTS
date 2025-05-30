@@ -1,10 +1,13 @@
-from DXL_PROTOCOL2.DXL_Protocol2_Declarations import *
-from DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Functions import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_Protocol2_Declarations import *
+from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Functions import *
 
-#from ROBOT_P2_CONFIG import ROBOT_NAME
+from ROBOTS.ROBOT_P2_CONFIG import ROBOT_NAME
 
-#---------- aqui se debe colocar el if 
-from ROBOT_P2_SPECS import * # elegir cual config cargar
+#---------- CARGAR LA CONFIGIRACION CORRECTA DEL ROBOT
+if ROBOT_NAME == "ROBOT_P2":
+    from ROBOTS.ROBOT_P2_SPECS import *
+if ROBOT_NAME == "BOGO_H_LEEG_P2":
+    from ROBOTS.BOGO_HALF_LEG_P2_SPECS import *
 
 from time import sleep
 
@@ -30,6 +33,7 @@ class ROBOT_P2(DXL_P2):
     def moveRobotByQVals(self,qf):
         self.qf = qf
         self.playtime = qf[-2]
+        self.pause = qf[-1]
 
         t0 = time.time() # t0 calcs
         self.getMotorsPosition() # get current pos
@@ -44,10 +48,12 @@ class ROBOT_P2(DXL_P2):
         tf = time.time()
         print("elapsed after playtime : " + str(tf-t0))
         print("")
+        sleep(self.pause)
         
     def moveRobotByQVals_Sync(self,qf):
         self.qf = qf
         self.playtime = qf[-2]
+        self.pause = qf[-1]
 
         t0 = time.time() # t0 calcs
         self.getMotorsPosition_Sync() # get current pos
@@ -62,6 +68,7 @@ class ROBOT_P2(DXL_P2):
         tf = time.time()
         print("elapsed after playtime : " + str(tf-t0))
         print("")
+        sleep(self.pause)
 
     def getMotorsPosition(self):
         qPos = []
