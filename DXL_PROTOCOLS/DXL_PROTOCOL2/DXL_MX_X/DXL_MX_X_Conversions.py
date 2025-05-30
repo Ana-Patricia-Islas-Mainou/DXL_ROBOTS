@@ -2,6 +2,28 @@ from math import *
 
 class DXL_P2_CONV:
   def deg2bits(slef, deg, offset): # OK
+    """
+    Converts **degrees** to **bits** for Dynamixels
+    MX and X using Protocol 2
+
+    Parameters
+    ----------
+    float deg:
+        degree value
+    
+    int offset:
+        motor offset in bits (0 deg value)   
+
+    Returns
+    -------
+    int
+        degrees value expressed as bits
+
+    Raises
+    ------
+    None
+    """
+
     return ceil(min(((deg/0.0879) + offset),4095))
 
 
