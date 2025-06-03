@@ -1,8 +1,15 @@
-# HEADER AND DECLARATIONS FOR PROTOCOL 2
-BAUDRATE                    = 2000000
-PROTOCOL_VERSION            = 1.0
-DEVICENAME                  = 'COM7'
-#DEVICENAME                  = "/dev/ttyUSB0" #'COM7'
+from ROBOTS.ROBOT_P1_CONFIG import *
+
+# CONTROL TABLE
+MX_ADDR_TORQUE_ENABLE          = 24
+MX_ADDR_GOAL_POSITION          = 30
+MX_ADDR_PRESENT_POSITION       = 36
+MX_ADDR_MOVING_SPEED           = 32
+
+# BYTE SIZE INSTRUCTIONS
+MX_LEN_GOAL_POSITION           = 2
+MX_LEN_PRESENT_POSITION        = 2
+MX_LEN_MOVING_SPEED            = 2
 
 # LIBRARIES
 from dynamixel_sdk import *
@@ -10,7 +17,7 @@ from dynamixel_sdk import *
 # HANDLERS DEFINITION
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
-groupBulkWrite = GroupBulkWrite(portHandler, packetHandler)
+groupBulkWritePosition = GroupBulkWrite(portHandler, packetHandler)
 groupBulkRead = GroupBulkRead(portHandler, packetHandler)
 
 def startCom():
