@@ -55,7 +55,7 @@ class ROBOT_P1():
         self.pause = qf[-1]
 
         t0 = time.time() # t0 calcs
-        self.getMotorsPosition_Sync() # get current pos
+        self.getMotorsPosition() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
         self.setMotorsPosition() # SYNC set new goal pos
@@ -76,59 +76,13 @@ class ROBOT_P1():
         self.q0 = qPos
         return self.q0
     
-    def configGetMotorsPosition_Sync(self):
-        for i in range(0, self.nMotors):
-            dxl_addparam_result = groupSyncReadPosition.addParam(self.motors[i].ID)
-            if dxl_addparam_result != True:
-                print("[ID:%03d] groupSyncRead addparam failed" % self.motors[i].ID)
-
-    def getMotorsPosition_Sync(self):
-        dxl_comm_result = groupSyncReadPosition.txRxPacket()
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-        #else:print("READ OK")
-        
-        for i in range(0, self.nMotors):
-            dxl_getdata_result = groupSyncReadPosition.isAvailable(self.motors[i].ID, 
-                                 ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
-            if dxl_getdata_result != True:
-                print("[ID:%03d] groupSyncRead getdata failed" % self.motors[i].ID)
-                #self.q0[i] = 0
-            else: 
-                self.q0[i] = groupSyncReadPosition.getData(self.motors[i].ID, 
-                             ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
-
-        return self.q0
-        
     def setMotorsPosition(self):
-        for i in range(0, self.nMotors): # build the message
-            param_goal_pos = [DXL_LOBYTE(DXL_LOWORD(self.qf[i])), DXL_HIBYTE(DXL_LOWORD(self.qf[i])),
-                              DXL_LOBYTE(DXL_HIWORD(self.qf[i])), DXL_HIBYTE(DXL_HIWORD(self.qf[i]))]
-            
-            dxl_addparam_result = groupBulkWritePosition.addParam(self.motors[i].ID, MX_ADDR_GOAL_POSITION, MX_LEN_GOAL_POSITION, param_goal_pos)
-            if dxl_addparam_result != True:
-                print("[ID:%03d] groupBulkWrite addparam failed" % self.motors[i].ID)
+        for i in range(0, self.nMotors):
+            self.motors[i].setPosition(self.qf[i])
 
-        dxl_comm_result = groupBulkWritePosition.txPacket() # send the message
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-
-        groupBulkWritePosition.clearParam() # clear comms
-    
     def setMotorsSpeed(self):
-        for i in range(0, self.nMotors): # build the message
-            param_goal_speed = [DXL_LOBYTE(DXL_LOWORD(self.qVel[i])), DXL_HIBYTE(DXL_LOWORD(self.qVel[i])),
-                              DXL_LOBYTE(DXL_HIWORD(self.qVel[i])), DXL_HIBYTE(DXL_HIWORD(self.qVel[i]))]
-            
-            dxl_addparam_result = groupSyncWriteSpeed.addParam(self.motors[i].ID, param_goal_speed)
-            if dxl_addparam_result != True:
-                print("[ID:%03d] groupSyncWrite addparam failed" % self.motors[i].ID)
-
-        dxl_comm_result = groupSyncWriteSpeed.txPacket() # send the message
-        if dxl_comm_result != COMM_SUCCESS:
-            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
-
-        groupSyncWriteSpeed.clearParam() # clear comms
+        for i in range(0, self.nMotors):
+            self.motors[i].setSpeed(self.qVel[i])
     
     def setMotorsTorque(self,torque):
         qPos = []
