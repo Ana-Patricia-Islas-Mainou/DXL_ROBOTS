@@ -1,7 +1,7 @@
 from math import *
 
 class DXL_P2_CONV:
-  def deg2bits(slef, deg, offset): # OK
+  def deg2bits(self, deg, offset): # OK
     """
     Converts **degrees** to **bits** for Dynamixels
     MX and X using Protocol 2
@@ -27,7 +27,7 @@ class DXL_P2_CONV:
     return ceil(min(((deg/0.0879) + offset),4095))
 
 
-  def rad2bits(slef, rad, offset): # OK
+  def rad2bits(self, rad, offset): # OK
     """
     Converts **radians** to **bits** for Dynamixels
     MX and X using Protocol 2
@@ -53,7 +53,7 @@ class DXL_P2_CONV:
     return ceil(min((rad*(180.0/(0.0879 * pi)) + offset),4095))
 
 
-  def bits2deg(slef, bits, offset): # OK
+  def bits2deg(self, bits, offset): # OK
     """
     Converts **bits** to **degrees** for Dynamixels
     MX and X using Protocol 2
@@ -61,7 +61,7 @@ class DXL_P2_CONV:
     Parameters
     ----------
     int bits:
-        degree value
+        bits value
     
     int offset:
         motor offset in bits (0 deg value)   
@@ -79,7 +79,7 @@ class DXL_P2_CONV:
     return (bits-offset)*0.0879
   
 
-  def bits2rad(slef, bits, offset): # OK
+  def bits2rad(self, bits, offset): # OK
     """
     Converts **bits** to **radians** for Dynamixels
     MX and X using Protocol 2
@@ -105,7 +105,7 @@ class DXL_P2_CONV:
     return (bits-offset)*((0.0879)*(pi/180.0))
   
 
-  def calcSpeedBits(slef, x0, xf, t): # OK
+  def calcSpeedBits(self, x0, xf, t): # OK
     """
     Calculates the motor speed in bits per second
 
@@ -137,6 +137,6 @@ class DXL_P2_CONV:
     return ceil(max(1,a))
   
 
-  def calcGradpSeg(slef, posInicGrados, posFinGrados, seg): 
+  def calcGradpSeg(self, posInicGrados, posFinGrados, seg): 
     gradPseg = ceil(abs(posFinGrados - posInicGrados)/seg)
     return gradPseg
