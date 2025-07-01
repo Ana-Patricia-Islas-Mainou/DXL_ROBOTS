@@ -18,18 +18,26 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
 
         self.offsets = offsets
 
-    def moveRobotByPose(self,pts): # no esta terminado REVISAR IK BRAZOS
-        qIK = IK_robot (pts,1,1) # new desiered position
-        qf = self.qValsToBits(qIK,self.offsets)
-        print(qf)
+    #def moveRobotByPose(self,pts,logger): # no esta terminado REVISAR IK BRAZOS
+    #    qIK = IK_robot (pts,1,1) # new desiered position
+    #    qf = self.qValsToBits(qIK,self.offsets)
+    #    print(qf)
     
     def moveLegsByPose(self, pts, basePos):
-        qIK = IK_robot (pts,1,0)
+        qIK = IK_robot (pts,1,0) #LEGS YES, ARMS NO
         legOffsets = self.offsets[6:18]
         qf = basePos[0:6] + self.qValsToBits(qIK,legOffsets)
         qf.append(pts[-2])
         qf.append(pts[-1])
         self.moveRobotByQVals(qf)
+
+    def moveLegsByPose_Sync(self, pts, basePos, logger):
+        qIK = IK_robot (pts,1,0) #LEGS YES, ARMS NO
+        legOffsets = self.offsets[6:18]
+        qf = basePos[0:6] + self.qValsToBits(qIK,legOffsets)
+        qf.append(pts[-2])
+        qf.append(pts[-1])
+        self.moveRobotByQVals_Sync(qf, logger)
 
     def moveRobotByJacobian(self):
         pass
