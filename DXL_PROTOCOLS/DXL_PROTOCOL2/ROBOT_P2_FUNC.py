@@ -5,9 +5,9 @@ from ROBOTS.ROBOT_P2_CONFIG import ROBOT_NAME
 
 #---------- ADD ANOTHER ROBOT INSIDE THIS IF
 if ROBOT_NAME == "ROBOT_P2":
-    from ROBOTS.ROBOT_P2_SPECS import *
+    from ROBOTS.ROBOT_P2_TEST.ROBOT_P2_SPECS import *
 if ROBOT_NAME == "BOGO_H_LEEG_P2":
-    from ROBOTS.BOGO_HALF_LEG_P2_SPECS import *
+    from ROBOTS.ROBOT_HALF_LEG_P2.BOGO_HALF_LEG_P2_SPECS import *
 
 from time import sleep
 
@@ -28,7 +28,8 @@ class ROBOT_P2(DXL_P2):
         self.playtime = 0
         self.pause = 0
 
-        self.configGetMotorsPosition_Sync()
+        #self.configGetMotorsPosition_Sync()
+        self.config_Sync()
 
     def moveRobotByQVals(self,qf):
         self.qf = qf
@@ -50,7 +51,7 @@ class ROBOT_P2(DXL_P2):
         print("")
         sleep(self.pause)
         
-    def moveRobotByQVals_Sync(self,qf):
+    def moveRobotByQVals_Sync(self,qf,logger=0):
         self.qf = qf
         self.playtime = qf[-2]
         self.pause = qf[-1]
@@ -60,6 +61,9 @@ class ROBOT_P2(DXL_P2):
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
         self.setMotorsPosition() # SYNC set new goal pos
+        if logger:
+            speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+        else: speedVals, currentVals, voltageVals, temperatureVals = 0,0,0,0
         tf = time.time() # tf calcs
 
         print("elapsed before playtime sleep: " + str(tf-t0))
@@ -70,6 +74,8 @@ class ROBOT_P2(DXL_P2):
         print("")
         sleep(self.pause)
 
+        return self.q0, speedVals, currentVals, voltageVals, temperatureVals
+
     def getMotorsPosition(self):
         qPos = []
         for i in range(0, self.nMotors):
@@ -77,6 +83,24 @@ class ROBOT_P2(DXL_P2):
         self.q0 = qPos
         return self.q0
     
+    def config_Sync(self):
+        for i in range(0, self.nMotors):
+            dxl_addparam_result = groupSyncReadPosition.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead POS addparam failed" % self.motors[i].ID)
+            dxl_addparam_result = groupSyncReadSpeed.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead VEL addparam failed" % self.motors[i].ID)
+            dxl_addparam_result = groupSyncReadCurrent.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead CUR addparam failed" % self.motors[i].ID)
+            dxl_addparam_result = groupSyncReadVoltage.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead VOL addparam failed" % self.motors[i].ID)
+            dxl_addparam_result = groupSyncReadtemperature.addParam(self.motors[i].ID)
+            if dxl_addparam_result != True:
+                print("[ID:%03d] groupSyncRead TMP addparam failed" % self.motors[i].ID)
+
     def configGetMotorsPosition_Sync(self):
         for i in range(0, self.nMotors):
             dxl_addparam_result = groupSyncReadPosition.addParam(self.motors[i].ID)
@@ -100,7 +124,74 @@ class ROBOT_P2(DXL_P2):
                              ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
 
         return self.q0
+    
+    def getLogger(self):
+        dxl_comm_result = groupSyncReadSpeed.txRxPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        dxl_comm_result = groupSyncReadCurrent.txRxPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        dxl_comm_result = groupSyncReadVoltage.txRxPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+        dxl_comm_result = groupSyncReadtemperature.txRxPacket()
+        if dxl_comm_result != COMM_SUCCESS:
+            print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+
+        speedVals = []
+        currentVals = []
+        voltageVals = []
+        temperatureVals=[]
+
+        for i in range(0, self.nMotors):
+
+            # SPEED
+            dxl_getdata_result = groupSyncReadSpeed.isAvailable(self.motors[i].ID, 
+                                    ADDR_PRESENT_SPEED, LEN_PRESENT_SPEED)
+            if dxl_getdata_result != True:
+                print("[ID:%03d] groupSyncRead VEL getdata failed" % self.motors[i].ID)
+                #self.q0[i] = 0
+            else: 
+                tmp = groupSyncReadSpeed.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_SPEED, LEN_PRESENT_SPEED)
+                if tmp > 0x7fffffff: speedVals.append(tmp - 4294967296)
+                else: speedVals.append(tmp)
+                
+            # CURRENT
+            dxl_getdata_result = groupSyncReadCurrent.isAvailable(self.motors[i].ID, 
+                                    ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
+            if dxl_getdata_result != True:
+                print("[ID:%03d] groupSyncRead CUR getdata failed" % self.motors[i].ID)
+                #self.q0[i] = 0
+            else: 
+                tmp = groupSyncReadCurrent.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
+                if tmp >  0x7fff: currentVals.append(tmp - 65536)
+                else: currentVals.append(tmp)
+                
+            # VOLTAGE
+            dxl_getdata_result = groupSyncReadVoltage.isAvailable(self.motors[i].ID, 
+                                    ADDR_PRESENT_VOLTAGE, LEN_PRESENT_VOLTAGE)
+            if dxl_getdata_result != True:
+                print("[ID:%03d] groupSyncRead VOL getdata failed" % self.motors[i].ID)
+                #self.q0[i] = 0
+            else: 
+                voltageVals.append(groupSyncReadVoltage.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_VOLTAGE, LEN_PRESENT_VOLTAGE))
+                
+            # TEMPERATURE
+            dxl_getdata_result = groupSyncReadtemperature.isAvailable(self.motors[i].ID, 
+                                    ADDR_PRESENT_TEMPERATURE, LEN_PRESENT_TEMPERATURE)
+            if dxl_getdata_result != True:
+                print("[ID:%03d] groupSyncRead VOL getdata failed" % self.motors[i].ID)
+                #self.q0[i] = 0
+            else: 
+                temperatureVals.append(groupSyncReadtemperature.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_TEMPERATURE, LEN_PRESENT_TEMPERATURE))
         
+        return speedVals, currentVals, voltageVals, temperatureVals
+
     def setMotorsPosition(self):
         for i in range(0, self.nMotors): # build the message
             param_goal_pos = [DXL_LOBYTE(DXL_LOWORD(self.qf[i])), DXL_HIBYTE(DXL_LOWORD(self.qf[i])),

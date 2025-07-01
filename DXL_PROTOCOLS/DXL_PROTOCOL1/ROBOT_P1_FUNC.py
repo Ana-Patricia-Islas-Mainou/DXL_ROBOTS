@@ -6,7 +6,7 @@ from ROBOTS.ROBOT_P1_CONFIG  import ROBOT_NAME
 
 #---------- CARGAR LA CONFIGIRACION CORRECTA DEL ROBOT
 if ROBOT_NAME == "ROBOT_P1":
-    from ROBOTS.ROBOT_P1_SPECS import *
+    from ROBOTS.ROBOT_P1_TEST.ROBOT_P1_SPECS import *
 
 from time import sleep
 

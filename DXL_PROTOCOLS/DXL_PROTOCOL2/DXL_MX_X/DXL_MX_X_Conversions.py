@@ -140,3 +140,15 @@ class DXL_P2_CONV:
   def calcGradpSeg(self, posInicGrados, posFinGrados, seg): 
     gradPseg = ceil(abs(posFinGrados - posInicGrados)/seg)
     return gradPseg
+  
+  def bits2radSec(bits):
+    return bits * 0.229 * 0.1047 # bits -> rpm * rmp -> rad/s
+  
+  def bits2mA(bits):
+    return bits * 3.36 # bits -> mA 
+  
+  def bits2volts(bits):
+    return bits * 0.1 # bits -> V
+  
+  def bits2tep(bits):
+    return bits * 1 # bits -> grados celcius 

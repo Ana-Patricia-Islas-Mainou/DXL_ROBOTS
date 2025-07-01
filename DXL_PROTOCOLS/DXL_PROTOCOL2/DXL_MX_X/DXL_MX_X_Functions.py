@@ -27,8 +27,8 @@ class DXL_P2(DXL_P2_CONV):
         Number Error
         """
 
-        if torque != 0 or torque != 1:
-            raise Exception("Error, torque must be 0 or 1")
+        #if torque != 0 or torque != 1:
+        #    raise Exception("Error, torque must be 0 or 1")
         
         self.torque = torque
 

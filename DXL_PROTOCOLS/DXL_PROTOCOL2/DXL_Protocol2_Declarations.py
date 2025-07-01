@@ -8,14 +8,22 @@ from ROBOTS.ROBOT_P2_CONFIG import *
 
 # CONTROL TABLE
 ADDR_TORQUE_ENABLE          = 64
+ADDR_MOVING_SPEED           = 112
 ADDR_GOAL_POSITION          = 116
 ADDR_PRESENT_POSITION       = 132
-ADDR_MOVING_SPEED           = 112
+ADDR_PRESENT_SPEED          = 128
+ADDR_PRESENT_CURRENT        = 126
+ADDR_PRESENT_VOLTAGE        = 144
+ADDR_PRESENT_TEMPERATURE    = 146
 
 # BYTE SIZE INSTRUCTIONS
 LEN_GOAL_POSITION           = 4
-LEN_PRESENT_POSITION        = 4
 LEN_MOVING_SPEED            = 4
+LEN_PRESENT_POSITION        = 4
+LEN_PRESENT_SPEED           = 4
+LEN_PRESENT_CURRENT         = 2
+LEN_PRESENT_VOLTAGE         = 2
+LEN_PRESENT_TEMPERATURE     = 1
 
 # LIBRARIES
 from dynamixel_sdk import *
@@ -29,6 +37,10 @@ groupSyncWritePosition = GroupSyncWrite(portHandler, packetHandler, ADDR_GOAL_PO
 groupSyncWriteSpeed = GroupSyncWrite(portHandler, packetHandler, ADDR_MOVING_SPEED, LEN_MOVING_SPEED)
 
 groupSyncReadPosition = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+groupSyncReadSpeed = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_SPEED, LEN_PRESENT_SPEED)
+groupSyncReadCurrent = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
+groupSyncReadVoltage = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_VOLTAGE, LEN_PRESENT_VOLTAGE)
+groupSyncReadtemperature = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_TEMPERATURE, LEN_PRESENT_TEMPERATURE)
 
 #COMMUNIACATION
 def startCom():
