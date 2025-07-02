@@ -1,9 +1,13 @@
 from HUMANOID.HUMANOID_MOVEMENTS import *
-# Iniciar la comunicacion
-robot = HUMANOID_MOVEMENT("B32")
 
-startCom()
+robot = HUMANOID_MOVEMENT("B32") # NOMBRE DE LA CARPETA CON POSES ROBOT
+
+startCom() # NO ELIMINAR 
+
+### ESCRIBIR EL PROGRAMA PRINCIPAL AQUI --------------------------------------------------
 
 robot.start()
 robot.Tpose()
-stopCom()
+
+### --------------------------------------------------------------------------------------
+stopCom() # NO ELIMINAR 

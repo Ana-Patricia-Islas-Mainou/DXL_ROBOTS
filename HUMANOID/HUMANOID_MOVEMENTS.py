@@ -7,17 +7,18 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
     def __init__(self, ROBOT_NAME):
         
         if ROBOT_NAME == "B31":
-            from ROBOTS.BOGO3.B31.B31_POSES import  offsets, standPos_QVals 
+            from ROBOTS.BOGO3.B31.B31_POSES import  offsets, standPos_QVals, sitPos_QVals
 
         if ROBOT_NAME == "B32":
-            from ROBOTS.BOGO3.B32.B32_POSES import offsets, standPos_QVals 
+            from ROBOTS.BOGO3.B32.B32_POSES import offsets, standPos_QVals, sitPos_QVals 
 
         if ROBOT_NAME == "B4":
-            from ROBOTS.BOGO4.B4_POSES import  offsets, standPos_QVals 
+            from ROBOTS.BOGO4.B4_POSES import  offsets, standPos_QVals, sitPos_QVals
         
         #super().__init__(ROBOT_NAME)
         self.offsets = offsets
         self.standPos_QVals = standPos_QVals
+        self.sitPos_QVals = sitPos_QVals
 
     #### SPECIFIC ACTIONS ------------------------------------------------------------------
     #### -----------------------------------------------------------------------------------
@@ -27,9 +28,8 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
         self.moveRobotByQVals(self.standPos_QVals)
 
     def shutdown(self):
-        # sit
-        #self.setMotorsTorque(1)
-        pass
+        self.moveRobotByQVals(self.sitPos_QVals)
+        self.setMotorsTorque(0)
 
     def Tpose(self):
         self.moveRobotByQVals(self.offsets)
