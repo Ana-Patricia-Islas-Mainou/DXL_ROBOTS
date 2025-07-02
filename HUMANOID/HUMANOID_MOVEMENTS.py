@@ -114,6 +114,7 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
     def walk_CartModel(self, Xzmp,  yzmp, radio, giro, tf, step, s, offset, logger=0):
         pAr, sAr, cAr, vAr, tAr = [], [], [], [], []
         t0 = time.time() # for realtime calcs
+        tTot = 0 # LOGGER ONLY
 
         for i in range(0,s):
             t = 0
@@ -128,10 +129,12 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
                 p, s, c, v, tp = self.moveLegsByPose_Sync(pts, offset, logger, t0)
                 # moveRobot_byPose(walk_TaskS)
                 t = t + dt
+                tTot = tTot + dt # LOGGER ONLY
 
                 if logger:
-                    p.insert(0,t); s.insert(0,t); c.insert(0,t)
-                    v.insert(0,t); tp.insert(0,t)
+                    p = str(tTot) + ", " + p; s = str(tTot) + ", " + s
+                    c = str(tTot) + ", " + c; v = str(tTot) + ", " + v
+                    tp = str(tTot) + ", " + tp
 
                     pAr.append(p); sAr.append(s); cAr.append(c)
                     vAr.append(v); tAr.append(tp)

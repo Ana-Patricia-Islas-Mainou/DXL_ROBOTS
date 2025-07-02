@@ -2,6 +2,20 @@ from DXL_PROTOCOLS.DXL_PROTOCOL2.ROBOT_P2_FUNC import *
 from time import sleep
 robot = ROBOT_P2()
 
+# CREATE LOGGER FILES 
+surfaceName = "GRASS"
+runName = "TEST1"
+
+fn = "LOGS/" + surfaceName + "/" + runName + "_POSITION.csv";     posFile = open(fn, "w")
+fn = "LOGS/" + surfaceName + "/" + runName + "_SPEED.csv";        speFile = open(fn, "w")
+fn = "LOGS/" + surfaceName + "/" + runName + "_CURRENT.csv";      curFile = open(fn, "w")
+fn = "LOGS/" + surfaceName + "/" + runName + "_VOLTAGE.csv";      volFile = open(fn, "w")
+fn = "LOGS/" + surfaceName + "/" + runName + "_TEMPERATURE.csv";  temFile = open(fn, "w")
+
+# ------------------------
+
+
+
 # Iniciar la comunicacion
 startCom()
 
@@ -44,6 +58,19 @@ print([p, s,c,v,t])
 des_pos[-1] = 0.2
 p, s, c, v, t = robot.moveRobotByQVals_Sync(des_pos,1)
 print([p, s,c,v,t])
+
+#posFile.writelines(p)
+speFile.writelines(s)
+curFile.writelines(c)
+volFile.writelines(v)
+temFile.writelines(t)
+
+# cerrar archivo
+posFile.close()
+speFile.close()
+curFile.close()
+volFile.close()
+temFile.close()
 
 robot.setMotorsTorque(0)
 

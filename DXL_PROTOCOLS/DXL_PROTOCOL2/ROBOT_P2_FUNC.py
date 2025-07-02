@@ -150,10 +150,10 @@ class ROBOT_P2(DXL_P2):
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
 
-        speedVals = []
-        currentVals = []
-        voltageVals = []
-        temperatureVals=[]
+        speedVals = ""
+        currentVals = ""
+        voltageVals = ""
+        temperatureVals=""
 
         for i in range(0, self.nMotors):
 
@@ -166,8 +166,8 @@ class ROBOT_P2(DXL_P2):
             else: 
                 tmp = groupSyncReadSpeed.getData(self.motors[i].ID, 
                                 ADDR_PRESENT_SPEED, LEN_PRESENT_SPEED)
-                if tmp > 0x7fffffff: speedVals.append(tmp - 4294967296)
-                else: speedVals.append(tmp)
+                if tmp > 0x7fffffff: speedVals = speedVals + str(tmp - 4294967296) +", "
+                else: speedVals = speedVals + str(tmp) + ", "
                 
             # CURRENT
             dxl_getdata_result = groupSyncReadCurrent.isAvailable(self.motors[i].ID, 
@@ -178,8 +178,8 @@ class ROBOT_P2(DXL_P2):
             else: 
                 tmp = groupSyncReadCurrent.getData(self.motors[i].ID, 
                                 ADDR_PRESENT_CURRENT, LEN_PRESENT_CURRENT)
-                if tmp >  0x7fff: currentVals.append(tmp - 65536)
-                else: currentVals.append(tmp)
+                if tmp >  0x7fff: currentVals = currentVals + str(tmp - 65536) + ", "
+                else: currentVals = currentVals + str(tmp) + ", "
                 
             # VOLTAGE
             dxl_getdata_result = groupSyncReadVoltage.isAvailable(self.motors[i].ID, 
@@ -188,8 +188,8 @@ class ROBOT_P2(DXL_P2):
                 print("[ID:%03d] groupSyncRead VOL getdata failed" % self.motors[i].ID)
                 #self.q0[i] = 0
             else: 
-                voltageVals.append(groupSyncReadVoltage.getData(self.motors[i].ID, 
-                                ADDR_PRESENT_VOLTAGE, LEN_PRESENT_VOLTAGE))
+                voltageVals = voltageVals + str(groupSyncReadVoltage.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_VOLTAGE, LEN_PRESENT_VOLTAGE)) + ", "
                 
             # TEMPERATURE
             dxl_getdata_result = groupSyncReadtemperature.isAvailable(self.motors[i].ID, 
@@ -198,8 +198,13 @@ class ROBOT_P2(DXL_P2):
                 print("[ID:%03d] groupSyncRead VOL getdata failed" % self.motors[i].ID)
                 #self.q0[i] = 0
             else: 
-                temperatureVals.append(groupSyncReadtemperature.getData(self.motors[i].ID, 
-                                ADDR_PRESENT_TEMPERATURE, LEN_PRESENT_TEMPERATURE))
+                temperatureVals = temperatureVals + str(groupSyncReadtemperature.getData(self.motors[i].ID, 
+                                ADDR_PRESENT_TEMPERATURE, LEN_PRESENT_TEMPERATURE)) + ", "
+
+        speedVals = speedVals + "\n"
+        currentVals = currentVals +"\n"
+        voltageVals = voltageVals + "\n"
+        temperatureVals = temperatureVals + "\n"
         
         return speedVals, currentVals, voltageVals, temperatureVals
 
