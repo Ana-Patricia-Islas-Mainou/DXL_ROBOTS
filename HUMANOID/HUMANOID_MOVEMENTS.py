@@ -6,58 +6,135 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
 
     def __init__(self, ROBOT_NAME):
         
-        if ROBOT_NAME == "BOGOBOT 3.1":
-            from ROBOTS.BOGO3.B31.B31_POSES import  offsets
+        if ROBOT_NAME == "B31":
+            from ROBOTS.BOGO3.B31.B31_POSES import  offsets, standPos_QVals 
 
-        if ROBOT_NAME == "BOGOBOT 3.2":
-            from ROBOTS.BOGO3.B32.B32_POSES import offsets
+        if ROBOT_NAME == "B32":
+            from ROBOTS.BOGO3.B32.B32_POSES import offsets, standPos_QVals 
 
-        if ROBOT_NAME == "BOGOBOT 4":
-            from ROBOTS.BOGO4.B4_POSES import  offsets
-        super().__init__(ROBOT_NAME)
-
+        if ROBOT_NAME == "B4":
+            from ROBOTS.BOGO4.B4_POSES import  offsets, standPos_QVals 
+        
+        #super().__init__(ROBOT_NAME)
         self.offsets = offsets
+        self.standPos_QVals = standPos_QVals
+
+    #### SPECIFIC ACTIONS ------------------------------------------------------------------
+    #### -----------------------------------------------------------------------------------
+
+    def start(self):
+        self.setMotorsTorque(1)
+        self.moveRobotByQVals(self.standPos_QVals)
+
+    def shutdown(self):
+        # sit
+        #self.setMotorsTorque(1)
+        pass
+
+    def Tpose(self):
+        self.moveRobotByQVals(self.offsets)
+    
+    def getUpBack():
+        # perfom one time algorithm 
+        pass
+
+    def getUpFront():
+        # perfom one time algorithm 
+        pass
+
+    def kickRight():
+        # perfom one time algorithm 
+        pass
+
+    def kickLeft():
+        # perfom one time algorithm 
+        pass
+
+    def walkCmdVel():
+        # walking algorithms here
+        pass
+
+    def latRightWalk():
+        # perfom one time algorithm 
+        pass
+
+    def latLeftWalk():
+        # perfom one time algorithm 
+        pass
+
+    def oneTimeAlgorithm():
+        pass
+
+
+
+    ### DEFINITIONS TO PERFORM MOVEMENTS -------------------------------------------------
+    ### ----------------------------------------------------------------------------------
 
     #def moveRobotByPose(self,pts,logger): # no esta terminado REVISAR IK BRAZOS
     #    qIK = IK_robot (pts,1,1) # new desiered position
     #    qf = self.qValsToBits(qIK,self.offsets)
     #    print(qf)
-    
-    def moveLegsByPose(self, pts, basePos):
+
+    def moveLegsByPose(self, pts, basePos, logger=0, t0=0.0): # privado???
+        if not(t0):
+            t0 = time.time()
+
         qIK = IK_robot (pts,1,0) #LEGS YES, ARMS NO
         legOffsets = self.offsets[6:18]
-        qf = basePos[0:6] + self.qValsToBits(qIK,legOffsets)
+        qf = basePos[0:6] + self._qValsToBits(qIK,legOffsets)
         qf.append(pts[-2])
         qf.append(pts[-1])
-        self.moveRobotByQVals(qf)
+        p, s, c, v, t = self.moveRobotByQVals(qf, logger, t0)
+        return p, s, c, v, t
 
-    def moveLegsByPose_Sync(self, pts, basePos, logger):
+    def moveLegsByPose_Sync(self, pts, basePos, logger=0, t0=0.0): # privado???
+        if not(t0):
+            t0 = time.time()
+
         qIK = IK_robot (pts,1,0) #LEGS YES, ARMS NO
         legOffsets = self.offsets[6:18]
-        qf = basePos[0:6] + self.qValsToBits(qIK,legOffsets)
+        qf = basePos[0:6] + self._qValsToBits(qIK,legOffsets)
         qf.append(pts[-2])
         qf.append(pts[-1])
-        self.moveRobotByQVals_Sync(qf, logger)
+        p, s, c, v, t  = self.moveRobotByQVals_Sync(qf, logger, t0)
+        return p, s, c, v, t
 
-    def moveRobotByJacobian(self):
+    def moveRobotByJacobian(self): # privado???
         pass
 
-    def qValsToBits(self,qRad, offset):
+    def _qValsToBits(self,qRad, offset): # PRIV
         qBits = []
         for i in range(0, len(qRad)):
             qBits.append(self.rad2bits(qRad[i], offset[i]))
         return qBits
     
-    def walk_CartModel(self, Xzmp,  yzmp, radio, giro, tf, step, s, offset):
+    #### WALKING ALGORITHMS ---------------------------------------------------------------
+    #### ----------------------------------------------------------------------------------    
+    
+    def walk_CartModel(self, Xzmp,  yzmp, radio, giro, tf, step, s, offset, logger=0):
+        pAr, sAr, cAr, vAr, tAr = [], [], [], [], []
+        t0 = time.time() # for realtime calcs
+
         for i in range(0,s):
             t = 0
             dt = 0.1
             stop = t + tf
+            
             #print("------------- inicio ciclo -----------")
             while (t < stop):
                 pts = cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step)
                 print(pts)
                 #print(pts)
-                self.moveLegsByPose(pts, offset)
+                p, s, c, v, tp = self.moveLegsByPose_Sync(pts, offset, logger, t0)
                 # moveRobot_byPose(walk_TaskS)
                 t = t + dt
+
+                if logger:
+                    p.insert(0,t); s.insert(0,t); c.insert(0,t)
+                    v.insert(0,t); tp.insert(0,t)
+
+                    pAr.append(p); sAr.append(s); cAr.append(c)
+                    vAr.append(v); tAr.append(tp)
+        
+        return pAr, sAr, cAr, vAr, tAr
+                

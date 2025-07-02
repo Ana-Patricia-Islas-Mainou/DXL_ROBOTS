@@ -31,32 +31,43 @@ class ROBOT_P2(DXL_P2):
         #self.configGetMotorsPosition_Sync()
         self.config_Sync()
 
-    def moveRobotByQVals(self,qf):
+    def moveRobotByQVals(self, qf, logger=0, t0=0.0):
         self.qf = qf
         self.playtime = qf[-2]
         self.pause = qf[-1]
 
-        t0 = time.time() # t0 calcs
+        if not(t0):
+            t0 = time.time() # t0 calcs
+
         self.getMotorsPosition() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
         self.setMotorsPosition() # SYNC set new goal pos
+
+        if logger:
+            speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+        else: speedVals, currentVals, voltageVals, temperatureVals = 0,0,0,0
+        
         tf = time.time() # tf calcs
 
-        print("elapsed before playtime sleep: " + str(tf-t0))
+        #print("elapsed before playtime sleep: " + str(tf-t0))                  # LOGGS
         sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
         
-        tf = time.time()
-        print("elapsed after playtime : " + str(tf-t0))
-        print("")
+        #tf = time.time()                                                       # LOGGS
+        #print("elapsed after playtime : " + str(tf-t0))                        # LOGGS
+        #print("")                                                              # LOGGS
         sleep(self.pause)
+
+        return self.q0, speedVals, currentVals, voltageVals, temperatureVals
         
-    def moveRobotByQVals_Sync(self,qf,logger=0):
+    def moveRobotByQVals_Sync(self, qf, logger=0, t0=0.0):
         self.qf = qf
         self.playtime = qf[-2]
         self.pause = qf[-1]
+        
+        if not(t0):
+            t0 = time.time() # t0 calcs
 
-        t0 = time.time() # t0 calcs
         self.getMotorsPosition_Sync() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
@@ -66,12 +77,12 @@ class ROBOT_P2(DXL_P2):
         else: speedVals, currentVals, voltageVals, temperatureVals = 0,0,0,0
         tf = time.time() # tf calcs
 
-        print("elapsed before playtime sleep: " + str(tf-t0))
+        #print("elapsed before playtime sleep: " + str(tf-t0))                  # LOGGS
         sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
-
-        tf = time.time()
-        print("elapsed after playtime : " + str(tf-t0))
-        print("")
+        
+        #tf = time.time()                                                       # LOGGS
+        #print("elapsed after playtime : " + str(tf-t0))                        # LOGGS
+        #print("")                                                              # LOGGS
         sleep(self.pause)
 
         return self.q0, speedVals, currentVals, voltageVals, temperatureVals
