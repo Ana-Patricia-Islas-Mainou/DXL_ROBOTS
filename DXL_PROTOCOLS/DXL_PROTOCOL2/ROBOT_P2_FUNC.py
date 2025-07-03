@@ -4,6 +4,8 @@ from DXL_PROTOCOLS.DXL_PROTOCOL2.DXL_MX_X.DXL_MX_X_Functions import *
 from ROBOTS.ROBOT_P2_CONFIG import ROBOT_NAME
 
 #---------- ADD ANOTHER ROBOT INSIDE THIS IF
+if ROBOT_NAME == "BOGO3":
+    from ROBOTS.BOGO3.BOGO3_SPECS import *
 if ROBOT_NAME == "ROBOT_P2":
     from ROBOTS.ROBOT_P2_TEST.ROBOT_P2_SPECS import *
 if ROBOT_NAME == "BOGO_H_LEEG_P2":
@@ -31,13 +33,12 @@ class ROBOT_P2(DXL_P2):
         #self.configGetMotorsPosition_Sync()
         self.config_Sync()
 
-    def moveRobotByQVals(self, qf, logger=0, t0=0.0):
+    def moveRobotByQVals(self, qf, logger=0):
         self.qf = qf
         self.playtime = qf[-2]
         self.pause = qf[-1]
 
-        if not(t0):
-            t0 = time.time() # t0 calcs
+        t0 = time.time() # t0 calcs
 
         self.getMotorsPosition() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
@@ -50,7 +51,7 @@ class ROBOT_P2(DXL_P2):
         
         tf = time.time() # tf calcs
 
-        #print("elapsed before playtime sleep: " + str(tf-t0))                  # LOGGS
+        print("elapsed before playtime sleep_QVALS: " + str(tf-t0))                  # LOGGS
         sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
         
         #tf = time.time()                                                       # LOGGS
@@ -60,25 +61,37 @@ class ROBOT_P2(DXL_P2):
 
         return self.q0, speedVals, currentVals, voltageVals, temperatureVals
         
-    def moveRobotByQVals_Sync(self, qf, logger=0, t0=0.0):
+    def moveRobotByQVals_Sync(self, qf, logger=0):
+        self.q0 = self.qf
+        print(self.q0)
         self.qf = qf
+        print(self.qf)
         self.playtime = qf[-2]
         self.pause = qf[-1]
         
-        if not(t0):
-            t0 = time.time() # t0 calcs
+        t0 = time.time() # t0 calcs
 
-        self.getMotorsPosition_Sync() # get current pos
+        try:
+            self.getMotorsPosition_Sync() # get current pos
+        except:
+            #self.getMotorsPosition()
+            pass
+
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
         self.setMotorsPosition() # SYNC set new goal pos
         if logger:
-            speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+            try:
+                speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+            except:
+                speedVals, currentVals, voltageVals, temperatureVals = "0, \n","0, \n","0, \n","0, \n"
         else: speedVals, currentVals, voltageVals, temperatureVals = 0,0,0,0
         tf = time.time() # tf calcs
-
-        #print("elapsed before playtime sleep: " + str(tf-t0))                  # LOGGS
-        sleep((self.playtime - (tf-t0))) # stop for exactly the desiered time
+        a = tf-t0
+        b = self.playtime - a
+        print("elapsed before playtime sleep: " + str(a))                  # LOGGS
+        if b > 0:
+            sleep(b) # stop for exactly the desiered time
         
         #tf = time.time()                                                       # LOGGS
         #print("elapsed after playtime : " + str(tf-t0))                        # LOGGS
@@ -130,6 +143,7 @@ class ROBOT_P2(DXL_P2):
             if dxl_getdata_result != True:
                 print("[ID:%03d] groupSyncRead getdata failed" % self.motors[i].ID)
                 #self.q0[i] = 0
+                raise Exception("Problem getting data")
             else: 
                 self.q0[i] = groupSyncReadPosition.getData(self.motors[i].ID, 
                              ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
@@ -140,15 +154,19 @@ class ROBOT_P2(DXL_P2):
         dxl_comm_result = groupSyncReadSpeed.txRxPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            raise Exception("Problem getting data")
         dxl_comm_result = groupSyncReadCurrent.txRxPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            raise Exception("Problem getting data")
         dxl_comm_result = groupSyncReadVoltage.txRxPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            raise Exception("Problem getting data")
         dxl_comm_result = groupSyncReadtemperature.txRxPacket()
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+            raise Exception("Problem getting data")
 
         speedVals = ""
         currentVals = ""

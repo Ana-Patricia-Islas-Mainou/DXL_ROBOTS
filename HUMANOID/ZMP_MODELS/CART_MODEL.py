@@ -1,8 +1,8 @@
 from math import *
 
 g = 980  
-h = 1
-hIK = 31
+h = 35
+hIK = 35
 
 # CONSTANT DEFINITION BASED ON STEP TYPE ---------------------------------------------------
 # FULL STEP 
@@ -109,4 +109,5 @@ def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo st
     walk_TaskS[14] = dt
     walk_TaskS[15] = 0
 
+    #print(walk_TaskS)
     return walk_TaskS
