@@ -62,7 +62,7 @@ class ROBOT_P2(DXL_P2):
         return self.q0, speedVals, currentVals, voltageVals, temperatureVals
         
     def moveRobotByQVals_Sync(self, qf, logger=0):
-        self.q0 = self.qf
+        q0 = self.qf
         print(self.q0)
         self.qf = qf
         print(self.qf)
@@ -72,9 +72,11 @@ class ROBOT_P2(DXL_P2):
         t0 = time.time() # t0 calcs
 
         try:
-            self.getMotorsPosition_Sync() # get current pos
+            posVals = self.getMotorsPosition_Sync() # get current pos
         except:
             #self.getMotorsPosition()
+            self.q0 = q0
+            posVals = "0,"
             pass
 
         self.calculateMotorsSpeed() # calc moving pos
@@ -98,14 +100,18 @@ class ROBOT_P2(DXL_P2):
         #print("")                                                              # LOGGS
         sleep(self.pause)
 
-        return self.q0, speedVals, currentVals, voltageVals, temperatureVals
+        posVals = posVals + "\n"
+        return posVals, speedVals, currentVals, voltageVals, temperatureVals
 
     def getMotorsPosition(self):
         qPos = []
+        qString = ""
         for i in range(0, self.nMotors):
-            qPos.append(self.motors[i].getPosition())
+            res = self.motors[i].getPosition()
+            qPos.append(res)
+            qString = qString + str(res) + ","
         self.q0 = qPos
-        return self.q0
+        return qString
     
     def config_Sync(self):
         for i in range(0, self.nMotors):
@@ -136,7 +142,7 @@ class ROBOT_P2(DXL_P2):
         if dxl_comm_result != COMM_SUCCESS:
             print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
         #else:print("READ OK")
-        
+        self.qString = ""
         for i in range(0, self.nMotors):
             dxl_getdata_result = groupSyncReadPosition.isAvailable(self.motors[i].ID, 
                                  ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
@@ -145,10 +151,12 @@ class ROBOT_P2(DXL_P2):
                 #self.q0[i] = 0
                 raise Exception("Problem getting data")
             else: 
-                self.q0[i] = groupSyncReadPosition.getData(self.motors[i].ID, 
+                res = groupSyncReadPosition.getData(self.motors[i].ID, 
                              ADDR_PRESENT_POSITION, LEN_PRESENT_POSITION)
+                self.q0[i] = res
+                qString = qString + str(res) + ","
 
-        return self.q0
+        return self.qString
     
     def getLogger(self):
         dxl_comm_result = groupSyncReadSpeed.txRxPacket()

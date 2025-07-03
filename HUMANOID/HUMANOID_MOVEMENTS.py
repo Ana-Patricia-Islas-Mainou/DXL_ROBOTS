@@ -134,7 +134,7 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
                 tTot = tTot + dt # LOGGER ONLY
 
                 if logger:
-                    #p = str(tTot) + ", " + p; 
+                    p = str(tTot) + ", " + p; 
                     s = str(tTot) + ", " + s
                     c = str(tTot) + ", " + c; v = str(tTot) + ", " + v
                     tp = str(tTot) + ", " + tp
