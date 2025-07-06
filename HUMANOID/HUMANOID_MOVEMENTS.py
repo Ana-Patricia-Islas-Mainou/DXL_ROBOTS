@@ -26,7 +26,7 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
 
     def start(self):
         self.setMotorsTorque(1)
-        p, s, c, v, t = self.moveLegsByPose_Sync(self.standPos_Pose, self.standPos_QVals,1)
+        p, s, c, v, t = self.moveLegsByPose_Sync(self.standPos_Pose, 0,0,1)
         #print(s)
 
     def shutdown(self):
@@ -89,8 +89,9 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
         p, s, c, v, t = self.moveRobotByQVals(qf, logger)
         return p, s, c, v, t
 
-    def moveLegsByPose_Sync(self, pts, basePos, logger=0): # privado???
+    def moveLegsByPose_Sync(self, pts, walk, extraMotor, logger=0): # privado???
         qIK = IK_robot (pts,1,0) #LEGS YES, ARMS NO
+        
         legOffsets = self.offsets #[6:18] SE QUITA PORQUE EL ROBOT ESTÁ DEFINIDO COMO SOLO LAS PIERNAS
         #qf = basePos[0:6] + self._qValsToBits(qIK,legOffsets)
         qf = self._qValsToBits(qIK,legOffsets)
@@ -118,17 +119,17 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
 
         for i in range(0,s):
             t = 0
-            dt = 0.1
+            dt = 0.15
             stop = t + tf
             
             #print("------------- inicio ciclo -----------")
             while (t < stop):
                 #t0 = time.time() # for realtime calcs
                 
-                pts = cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step)
+                pts, extraMotor = cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step)
                 #print(pts)
                 self.setMotorsTorque(1)
-                p, s, c, v, tp = self.moveLegsByPose_Sync(pts, self.standPos_QVals, logger)
+                p, s, c, v, tp = self.moveLegsByPose_Sync(pts, 1, extraMotor, logger)
                 # moveRobot_byPose(walk_TaskS)
                 t = t + dt
                 tTot = tTot + dt # LOGGER ONLY

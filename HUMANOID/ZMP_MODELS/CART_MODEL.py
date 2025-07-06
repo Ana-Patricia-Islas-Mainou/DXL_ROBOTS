@@ -59,6 +59,10 @@ def zmpY_foot(i,  yzmp):
     if (i%2 == 0):return -yzmp
     else: return yzmp
 
+def sine_(t, a, x):
+  w = pi/t
+  return ceil(a * sin(w*x))
+
 # CART MODEL ALGORITH 
 def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo step
     #print(step[i])
@@ -80,6 +84,7 @@ def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo st
     zMovil = pz(t, stop, radio)
 
     walk_TaskS = [0]*16
+    extraMotor = [0,0]
 
     if (Yzmp > 0):# si yzmp es positivo usar pierna izq armar pose acorde
         # mover el centro de masa con la pierna izquierda 
@@ -87,11 +92,14 @@ def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo st
         walk_TaskS[1] = yFijo # y left leg
         walk_TaskS[2] = zFijo # z left leg
         walk_TaskS[3] = giro  # alpha left leg
+        extraMotor[1] = sine_(tf,35,t)
+
         # dar paso con la pierna derecha
         walk_TaskS[4] = xMovil # x right leg
         walk_TaskS[5] = yMovil # y right leg
         walk_TaskS[6] = zMovil # z right leg 
         walk_TaskS[7] = 0      # alpha right leg
+        extraMotor[0] = 0
          
     else:
         # dar paso con la pierna izquierda
@@ -99,15 +107,18 @@ def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo st
         walk_TaskS[1] = yMovil # y left leg
         walk_TaskS[2] = zMovil # z leftt leg  
         walk_TaskS[3] = 0      # alpha left let
+        extraMotor[1] = 0
+
         # mover el centro de masa con la pierna derecha 
         walk_TaskS[4] = xFijo # x right leg
         walk_TaskS[5] = yFijo # y right leg
         walk_TaskS[6] = zFijo # z right leg
         walk_TaskS[7] = giro  # alpha right leg
+        extraMotor[0] = sine_(tf,35,t)
         
 
     walk_TaskS[14] = dt
     walk_TaskS[15] = 0
 
     #print(walk_TaskS)
-    return walk_TaskS
+    return walk_TaskS, extraMotor

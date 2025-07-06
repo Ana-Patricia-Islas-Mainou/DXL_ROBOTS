@@ -87,11 +87,11 @@ class DXL_P2(DXL_P2_CONV):
         """
 
         self.present_position, dxl_comm_result, dxl_error = packetHandler.read4ByteTxRx(portHandler, self.ID, ADDR_PRESENT_POSITION)
-        """
+        
         if dxl_comm_result != COMM_SUCCESS:
             print(str(self.ID) + " Read Position %s" % packetHandler.getTxRxResult(dxl_comm_result))
         elif dxl_error != 0:
-            print(str(self.ID) + " Read Position %s" % packetHandler.getRxPacketError(dxl_error))"""
+            print(str(self.ID) + " Read Position %s" % packetHandler.getRxPacketError(dxl_error))
     
     def getPosition(self):
         """

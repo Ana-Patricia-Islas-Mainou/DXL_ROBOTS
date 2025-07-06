@@ -40,13 +40,16 @@ class ROBOT_P2(DXL_P2):
 
         t0 = time.time() # t0 calcs
 
-        self.getMotorsPosition() # get current pos
+        posVals = self.getMotorsPosition() # get current pos
         self.calculateMotorsSpeed() # calc moving pos
         self.setMotorsSpeed() # SYNC set new moving speed
         self.setMotorsPosition() # SYNC set new goal pos
 
         if logger:
-            speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+            try:
+                speedVals, currentVals, voltageVals, temperatureVals = self.getLogger()
+            except:
+                speedVals, currentVals, voltageVals, temperatureVals = "0, \n","0, \n","0, \n","0, \n"
         else: speedVals, currentVals, voltageVals, temperatureVals = 0,0,0,0
         
         tf = time.time() # tf calcs
@@ -59,7 +62,8 @@ class ROBOT_P2(DXL_P2):
         #print("")                                                              # LOGGS
         sleep(self.pause)
 
-        return self.q0, speedVals, currentVals, voltageVals, temperatureVals
+        posVals = posVals + "\n"
+        return posVals, speedVals, currentVals, voltageVals, temperatureVals
         
     def moveRobotByQVals_Sync(self, qf, logger=0):
         q0 = self.qf
@@ -72,7 +76,7 @@ class ROBOT_P2(DXL_P2):
         t0 = time.time() # t0 calcs
 
         try:
-            posVals = self.getMotorsPosition_Sync() # get current pos
+            posVals = self.getMotorsPosition() # get current pos
         except:
             #self.getMotorsPosition()
             self.q0 = q0
