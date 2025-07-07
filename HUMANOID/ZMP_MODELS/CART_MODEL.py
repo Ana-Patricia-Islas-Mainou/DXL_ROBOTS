@@ -1,7 +1,7 @@
 from math import *
 
 g = 980  
-h = 1
+h = 40
 hIK = 35
 
 # CONSTANT DEFINITION BASED ON STEP TYPE ---------------------------------------------------
@@ -79,7 +79,7 @@ def cartModel(Xzmp,yzmp,radio,giro,t,dt,tf,stop,i,step): #step[i] volver solo st
     zFijo = -hIK
 
     # pie movil -------------------------------
-    xMovil = 0
+    xMovil = 0 - 2*xFijo
     yMovil = yFijo
     zMovil = pz(t, stop, radio)
 
