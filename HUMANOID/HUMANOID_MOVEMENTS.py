@@ -119,7 +119,7 @@ class HUMANOID_MOVEMENT(ROBOT_P2):
 
         for i in range(0,s):
             t = 0
-            dt = 0.15
+            dt = 0.1
             stop = t + tf
             
             #print("------------- inicio ciclo -----------")

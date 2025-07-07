@@ -102,7 +102,7 @@ class ROBOT_P2(DXL_P2):
         #tf = time.time()                                                       # LOGGS
         #print("elapsed after playtime : " + str(tf-t0))                        # LOGGS
         #print("")                                                              # LOGGS
-        sleep(self.pause)
+        #sleep(self.pause)
 
         posVals = posVals + "\n"
         return posVals, speedVals, currentVals, voltageVals, temperatureVals

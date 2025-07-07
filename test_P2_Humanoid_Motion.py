@@ -9,7 +9,7 @@ arms = [DXL_P2(1), DXL_P2(2),DXL_P2(3), DXL_P2(4), DXL_P2(5), DXL_P2(6)]
 
 # CREATE FILES FOR LOGGER ...
 surfaceName = "FLAT"
-runName = "TEST2"
+runName = "TEST3"
 
 posFile, speFile, curFile, volFile, temFile = buildFileLogger(surfaceName, runName)
 files = [posFile, speFile, curFile, volFile, temFile]
@@ -32,10 +32,10 @@ time.sleep(10)
 #print([p, s,c,v,t])
 
 #robot.Tpose()
-tf = 0.6; radio = 2.5
-Xzmp = 8.2; yzmp = 4.2
+tf = 0.4; radio = 2.5
+Xzmp = 8.2; yzmp = 8.2
 giro  =0; step = [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3]; s = len(step)
-pAr, sAr, cAr, vAr, tAr = robot.walk_CartModel(Xzmp,  yzmp, radio, giro, tf, step, s, 1)
+pAr, sAr, cAr, vAr, tAr = robot.walk_CartModel(Xzmp,  yzmp, radio, giro, tf, step, s, 0)
 
 writeToFIle(posFile, pAr)
 writeToFIle(speFile, sAr)

@@ -1,7 +1,7 @@
 from math import *
 
 g = 980  
-h = 35
+h = 1
 hIK = 35
 
 # CONSTANT DEFINITION BASED ON STEP TYPE ---------------------------------------------------
