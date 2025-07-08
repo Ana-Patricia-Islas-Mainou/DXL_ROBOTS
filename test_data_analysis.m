@@ -3,16 +3,16 @@ clear; clc
 
 showPlots = 0;
 % basic analisis of all samples
-[T_c1_FLAT, A_c1_FLAT, stats_c1_FLAT] = basicAnalysis('LOGS\FLAT\TEST2_CURRENT.csv',1,showPlots);
-[T_v1_FLAT, A_v1_FLAT, stats_v1_FLAT] = basicAnalysis('LOGS\FLAT\TEST2_VOLTAGE.csv',2,showPlots);
-[T_t1_FLAT, A_t1_FLAT, stats_t1_FLAT] = basicAnalysis('LOGS\FLAT\TEST2_TEMPERATURE.csv',3,showPlots);
-[T_s1_FLAT, A_s1_FLAT, stats_s1_FLAT] = basicAnalysis('LOGS\FLAT\TEST2_SPEED.csv',4,showPlots);
+[T_c1_FLAT, A_c1_FLAT, stats_c1_FLAT] = basicAnalysis('LOGS\FLAT\TEST4_CURRENT.csv',1,showPlots);
+[T_v1_FLAT, A_v1_FLAT, stats_v1_FLAT] = basicAnalysis('LOGS\FLAT\TEST4_VOLTAGE.csv',2,showPlots);
+[T_t1_FLAT, A_t1_FLAT, stats_t1_FLAT] = basicAnalysis('LOGS\FLAT\TEST4_TEMPERATURE.csv',3,showPlots);
+[T_s1_FLAT, A_s1_FLAT, stats_s1_FLAT] = basicAnalysis('LOGS\FLAT\TEST4_SPEED.csv',4,showPlots);
 
 % current specific
-%make_lineplot_all_motors(A_c1_FLAT, "Current [mA]")
+make_lineplot_all_motors(A_c1_FLAT, "Current [mA]")
 %make_lineplot_individual_run(A_c1_FLAT,"Current [mA]", 18)
-%make_lineplot_compareLegs(A_c1_FLAT,"Current [mA]")
-%make_lineplot_wholeRobot(A_c1_FLAT,"Current [mA]")
+make_lineplot_compareLegs(A_c1_FLAT,"Current [mA]")
+make_lineplot_wholeRobot(A_c1_FLAT,"Current [mA]")
 
 % voltage specific -------
 %make_lineplot_all_motors(A_v1_FLAT, "Voltage [V]")
@@ -28,7 +28,7 @@ showPlots = 0;
 showPlots = 1;
 
 % power and energy ---------
-[eP, ePTot, eE, eETot] = electPowerEnegry(A_c1_FLAT, A_v1_FLAT, 0.1, showPlots);
+%[eP, ePTot, eE, eETot] = electPowerEnegry(A_c1_FLAT, A_v1_FLAT, 0.1, showPlots);
 
 %T_eP1_FLAT = basicStadistics(eP);
 %T_eE1_FLAT = basicStadistics(eE);
@@ -38,7 +38,7 @@ showPlots = 1;
 
 % KPI ----------------------------------
 % COST OF TRANSPORT ------
-costOfTransport(5.2, 9.81, 1.11, eETot) % mRobot, g, d, eETot
+%costOfTransport(5.2, 9.81, 1.11, eETot) % mRobot, g, d, eETot
 
 %% FUNCIONES 
 
@@ -139,6 +139,14 @@ function T = loadAndCleanData(fname)
     T = readtable(fname,'ReadVariableNames',false);
     T= rmmissing(T);
     T = T(:,1:end-1);
+    % [numFilas, numColumnas] = size(T);
+    % for i = 1:numFilas
+    %     for j = 1:numColumnas
+    %         T(i,j)
+    %         T(i,j) = str2num(T(i,j))
+    %     end
+    % end
+    
 end
 
 
@@ -168,7 +176,7 @@ end
 
 % BASICOS PARA CADA ARCIVO ------------------------------------------------
 function [T,A, stats_T] = basicAnalysis(fname, id, showPlots)
-    T = loadAndCleanData(fname);
+    T = loadAndCleanData(fname)
     if id == 1
         dataInfo = "Current [mA]"; 
         [T, A] = bits2mAmp(T);

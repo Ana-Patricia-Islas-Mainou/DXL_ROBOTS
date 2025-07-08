@@ -8,8 +8,8 @@ arms = [DXL_P2(1), DXL_P2(2),DXL_P2(3), DXL_P2(4), DXL_P2(5), DXL_P2(6)]
 
 
 # CREATE FILES FOR LOGGER ...
-surfaceName = "STAIRS"
-runName = "TEST4"
+surfaceName = "GRASS"
+runName = "TEST3"
 
 posFile, speFile, curFile, volFile, temFile = buildFileLogger(surfaceName, runName)
 files = [posFile, speFile, curFile, volFile, temFile]
@@ -36,7 +36,7 @@ tf = 0.4; radio = 3.5
 Xzmp = 2.2; yzmp = 4.2
 giro  =-pi/48;  step = [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3]; 
 s = len(step)
-pAr, sAr, cAr, vAr, tAr = robot.walk_CartModel(Xzmp,  yzmp, radio, giro, tf, step, s, 0)
+pAr, sAr, cAr, vAr, tAr = robot.walk_CartModel(Xzmp,  yzmp, radio, giro, tf, step, s, 1)
 
 writeToFIle(posFile, pAr)
 writeToFIle(speFile, sAr)

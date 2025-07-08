@@ -1,7 +1,7 @@
 %%
 % IMU 
 
-T_imu = readtable('LOGS\FLAT\MPU6050_FLAT_TEST1.csv','ReadVariableNames',false);
+T_imu = readtable('LOGS\FLAT\MPU6050_FLAT_TEST4.csv','ReadVariableNames',false);
 T_imu = rmmissing(T_imu);
 A_imu = table2array(T_imu);
 
