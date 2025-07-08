@@ -1,4 +1,5 @@
 from math import *
+import numpy as np
 
 from ROBOTS.ROBOT_P2_CONFIG import ROBOT_NAME
 
@@ -174,3 +175,197 @@ def IK_robot (pts, legs, arms):
     if legs == 0 and arms == 1:
         q = [q1,q2,q3,q4,q5,q6]
     return q
+
+
+
+
+def getRightLeg_POSE(qLeg):
+    # piernas del robot
+    L1 = L[0] 
+    L2 = L[1] 
+    L3 = L[2] 
+    L4 = L[3]
+
+    q7 = qLeg[0]
+    q9 = qLeg[1]
+    q11 = qLeg[2]
+    q13 = qLeg[3]
+    q15 = qLeg[4]
+    q17 = qLeg[5]
+
+    c7 = cos(q7)
+    s7 = sin(q7)
+    c9 = cos(q9)
+    s9 = sin(q9)
+    c11 = cos(q11)
+    s11 = sin(q11)
+    c13 = cos(q13)
+    s13 = sin(q13)
+    c15 = cos(q15)
+    s15 = sin(q15)
+    c17 = cos(q17)
+    s17 = sin(q17)
+
+    # Define the position and orientation vector
+    legPose = np.zeros((6,1))
+
+    # Calculate de position vector using FK [x;y;z]
+    legPose[0,0] = L3*(c7*s11 - c11*s7*s9) + L4*(c13*(c7*s11 - c11*s7*s9) + s13*(c7*c11 + s7*s9*s11)) # x
+    legPose[1,0] = - L3*(s7*s11 + c7*c11*s9) - L4*(c13*(s7*s11 + c7*c11*s9) + s13*(c11*s7 - c7*s9*s11)) # y
+    legPose[2,0] = -c9*(L4*cos(q11 + q13) + L3*c11) # z
+
+    # Calculate the orientation vector using Kajita's formula
+
+    # rotation matrix
+    r11 = s15*(c13*(c7*s11 - c11*s7*s9) + s13*(c7*c11 + s7*s9*s11)) + c15*(c13*(c7*c11 + s7*s9*s11) - s13*(c7*s11 - c11*s7*s9))
+    r12 = s17*(s15*(c13*(c7*c11 + s7*s9*s11) - s13*(c7*s11 - c11*s7*s9)) - c15*(c13*(c7*s11 - c11*s7*s9) + s13*(c7*c11 + s7*s9*s11))) + c9*c17*s7
+    r13 = c17*(s15*(c13*(c7*c11 + s7*s9*s11) - s13*(c7*s11 - c11*s7*s9)) - c15*(c13*(c7*s11 - c11*s7*s9) + s13*(c7*c11 + s7*s9*s11))) - c9*s7*s17
+
+    r21 = - s15*(c13*(s7*s11 + c7*c11*s9) + s13*(c11*s7 - c7*s9*s11)) - c15*(c13*(c11*s7 - c7*s9*s11) - s13*(s7*s11 + c7*c11*s9))
+    r22 = c7*c9*c17 - s17*(s15*(c13*(c11*s7 - c7*s9*s11) - s13*(s7*s11 + c7*c11*s9)) - c15*(c13*(s7*s11 + c7*c11*s9) + s13*(c11*s7 - c7*s9*s11)))
+    r23 = - c17*(s15*(c13*(c11*s7 - c7*s9*s11) - s13*(s7*s11 + c7*c11*s9)) - c15*(c13*(s7*s11 + c7*c11*s9) + s13*(c11*s7 - c7*s9*s11))) - c7*c9*s17
+
+    r31 = sin(q11 + q13 - q15)*c9
+    r32 = cos(q11 + q13 - q15)*c9*s17 - c17*s9
+    r33 = s9*s17 + cos(q11 + q13 - q15)*c9*c17
+
+    # Determine if the matrix is diagonal
+    ctrDiag = 0 # when this counter stays at 0 the matrix is diagonal
+
+    if (r12 != 0): ctrDiag = ctrDiag+1
+    if (r13 != 0): ctrDiag = ctrDiag+1
+    if (r21 != 0): ctrDiag = ctrDiag+1
+    if (r23 != 0): ctrDiag = ctrDiag+1
+    if (r31 != 0): ctrDiag = ctrDiag+1
+    if (r32 != 0): ctrDiag = ctrDiag+1
+
+    k1 = 0
+    k2 = 0
+    k3 = 0
+
+    if (ctrDiag == 0):
+        # the matrix is diagonal
+        k1 = (2*pi/2)*(r11 +1)
+        k2 = (2*pi/2)*(r22 +1)
+        k3 = (2*pi/2)*(r33 +1)
+    
+    else:
+        # the matrix is not diagonal
+        l1 = r32 - r23
+        l2 = r13 - r31
+        l3 = r21 - r12
+
+        mag_l = sqrt(pow(l1,2) + pow(l2,2) + pow(l3,2))
+        theta = atan2(mag_l, r11 + r22 + r33 -1)
+
+        k1 = theta * (l1/mag_l)
+        k2 = theta * (l2/mag_l)
+        k3 = theta * (l3/mag_l)
+        
+    k1 = atan2(sin(k1), cos(k1))
+    k2 = atan2(sin(k2), cos(k2))
+    k3 = atan2(sin(k3), cos(k3))
+
+    legPose[3,0] = k1
+    legPose[4,0] = k2
+    legPose[5,0] = k3
+
+    #Serial.println("RIGHT LEG POSE");
+    #for (int i = 0; i<6; i = i+1){
+    #Serial.println(legPose(i,0));
+    #}
+    return legPose
+
+def getLeftLeg_POSE(qLeg):
+    # piernas del robot
+    L1 = L[0] 
+    L2 = L[1] 
+    L3 = L[2] 
+    L4 = L[3]
+
+    q8 = qLeg[0]
+    q10 = qLeg[1]
+    q12 = qLeg[2]
+    q14 = qLeg[3]
+    q16 = qLeg[4]
+    q18 = qLeg[5]
+
+    c8 = cos(q8)
+    s8 = sin(q8)
+    c10 = cos(q10)
+    s10 = sin(q10)
+    c12 = cos(q12)
+    s12 = sin(q12)
+    c14 = cos(q14)
+    s14 = sin(q14)
+    c16 = cos(q16)
+    s16 = sin(q16)
+    c18 = cos(q18)
+    s18 = sin(q18)
+
+    # position and orientation vector
+    legPose = np.zeros((6,1))
+
+    # Calculate de position vector using FK [x;y;z]
+    legPose[0,0] = - L3*(c8*s12 + c12*s8*s10) - L4*(c14*(c8*s12 + c12*s8*s10) + s14*(c8*c12 - s8*s10*s12))
+    legPose[1,0] = L3*(s8*s12 - c8*c12*s10) + L4*(c14*(s8*s12 - c8*c12*s10) + s14*(c12*s8 + c8*s10*s12))
+    legPose[2,0] = -c10*(L4*cos(q12 + q14) + L3*c12)
+
+    # Calculate the orientation vector using Kajita's formula
+
+    # rotation matrix
+    r11 = sin(q16)*(cos(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10)) + sin(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12))) + cos(q16)*(cos(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12)) - sin(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10)))
+    r12 = cos(q10)*cos(q18)*sin(q8) - sin(q18)*(sin(q16)*(cos(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12)) - sin(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10))) - cos(q16)*(cos(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10)) + sin(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12))))
+    r13 = - cos(q18)*(sin(q16)*(cos(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12)) - sin(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10))) - cos(q16)*(cos(q14)*(cos(q8)*sin(q12) + cos(q12)*sin(q8)*sin(q10)) + sin(q14)*(cos(q8)*cos(q12) - sin(q8)*sin(q10)*sin(q12)))) - cos(q10)*sin(q8)*sin(q18)
+
+    r21 = - sin(q16)*(cos(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10)) + sin(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12))) - cos(q16)*(cos(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12)) - sin(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10)))
+    r22 = sin(q18)*(sin(q16)*(cos(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12)) - sin(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10))) - cos(q16)*(cos(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10)) + sin(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12)))) + cos(q8)*cos(q10)*cos(q18)
+    r23 = cos(q18)*(sin(q16)*(cos(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12)) - sin(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10))) - cos(q16)*(cos(q14)*(sin(q8)*sin(q12) - cos(q8)*cos(q12)*sin(q10)) + sin(q14)*(cos(q12)*sin(q8) + cos(q8)*sin(q10)*sin(q12)))) - cos(q8)*cos(q10)*sin(q18)
+
+    r31 = -sin(q12 + q14 - q16)*cos(q10)
+    r32 = cos(q12 + q14 - q16)*cos(q10)*sin(q18) - cos(q18)*sin(q10)
+    r33 = sin(q10)*sin(q18) + cos(q12 + q14 - q16)*cos(q10)*cos(q18)
+
+    # Determine if the matrix is diagonal
+    ctrDiag = 0; # when this counter stays at 0 the matrix is diagonal
+
+    if (r12 != 0): ctrDiag = ctrDiag+1
+    if (r13 != 0): ctrDiag = ctrDiag+1
+    if (r21 != 0): ctrDiag = ctrDiag+1 
+    if (r23 != 0): ctrDiag = ctrDiag+1 
+    if (r31 != 0): ctrDiag = ctrDiag+1
+    if (r32 != 0): ctrDiag = ctrDiag+1
+
+    k1 = 0
+    k2 = 0
+    k3 = 0
+
+    if (ctrDiag == 0):
+        # the matrix is diagonal
+        k1 = (2*pi/2)*(r11 +1)
+        k2 = (2*pi/2)*(r22 +1)
+        k3 = (2*pi/2)*(r33 +1)
+        
+    else:
+        # the matrix is not diagonal
+        l1 = r32 - r23
+        l2 = r13 - r31
+        l3 = r21 - r12
+
+        mag_l = sqrt(pow(l1,2) + pow(l2,2) + pow(l3,2))
+        theta = atan2(mag_l, r11 + r22 + r33 -1)
+
+        k1 = theta * (l1/mag_l)
+        k2 = theta * (l2/mag_l)
+        k3 = theta * (l3/mag_l)
+        
+
+    k1 = atan2(sin(k1), cos(k1))
+    k2 = atan2(sin(k2), cos(k2))
+    k3 = atan2(sin(k3), cos(k3))
+
+    legPose(3,0) = k1
+    legPose(4,0) = k2
+    legPose(5,0) = k3
+
+    return legPose

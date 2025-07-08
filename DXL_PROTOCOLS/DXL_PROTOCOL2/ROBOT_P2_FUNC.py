@@ -115,7 +115,7 @@ class ROBOT_P2(DXL_P2):
             qPos.append(res)
             qString = qString + str(res) + ","
         self.q0 = qPos
-        return qString
+        return qString, self.q0
     
     def config_Sync(self):
         for i in range(0, self.nMotors):
